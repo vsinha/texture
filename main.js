@@ -61,8 +61,6 @@ class Cell {
     this.height = height;
     this.visible = true;
     this.update();
-
-    this.refresh_interval = 1000 / 60;
   }
 
   update() {
@@ -84,11 +82,6 @@ class Cell {
     if (this.row == 20 && this.col == 20) {
       //console.log(this.radius);
     }
-
-    // this.refresh_interval = 1000 * Math.random() + 500;
-    setTimeout(() => {
-      this.update();
-    }, this.refresh_interval);
   }
 
   render() {
@@ -132,6 +125,12 @@ function render_grid(grid, width, height) {
 
 function update() {
   now = new Date();
+
+  for (const row of grid) {
+    for (const cell of row) {
+      cell.update();
+    }
+  }
 }
 
 function render() {
@@ -151,6 +150,7 @@ function update_loop() {}
 
 function draw_loop() {
   setTimeout(function () {
+    update();
     requestAnimationFrame(draw_loop);
     render();
   }, 1000 / fps);
