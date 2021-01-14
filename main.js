@@ -82,7 +82,7 @@ class Cell {
     this.radius = clamp(this.radius, 0, 4);
 
     if (this.row == 20 && this.col == 20) {
-      console.log(this.radius);
+      //console.log(this.radius);
     }
 
     // this.refresh_interval = 1000 * Math.random() + 500;
