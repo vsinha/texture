@@ -7,6 +7,8 @@ let ctx;
 let grid;
 let now;
 
+let render_ticks = 0;
+
 let mouse_x = width / 2;
 let mouse_y = height / 2;
 
@@ -16,7 +18,7 @@ function init() {
   ctx.canvas.width = width;
   ctx.canvas.height = height;
 
-  canvas.style.background = "#112244";
+  canvas.style.background = "#011224";
 
   update_loop();
   draw_loop();
@@ -30,7 +32,7 @@ function circle(x, y, radius) {
 }
 
 function render_circle(circle) {
-  ctx.fillStyle = "#ffddaa";
+  ctx.fillStyle = "#fffdda";
   ctx.fill(circle); //   <<< pass circle to context
 
   // ctx.lineWidth = 1;
@@ -42,22 +44,48 @@ function distance_2d(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
+function clamp(num, min, max) {
+  return num <= min ? min : num >= max ? max : num;
+}
+
 class Cell {
   constructor(row, col, x, y, width, height) {
+    this.row = row;
+    this.col = col;
     this.x = x;
     this.y = y;
+    this.dx = 0;
+    this.dy = 0;
+    this.radius = 1;
     this.width = width;
     this.height = height;
+    this.visible = true;
     this.update();
+
+    // this.refresh_interval = 10 * Math.random();
   }
 
   update() {
-    let visible_chance = 0.1;
-    visible_chance += 20 / distance_2d(this.x, this.y, mouse_x, mouse_y);
+    // let visible_chance = 0.1;
+    // visible_chance += 20 / distance_2d(this.x, this.y, mouse_x, mouse_y);
+    // this.visible = Math.random() < 0.9;
 
-    this.visible = Math.random() < visible_chance;
+    let x = mouse_x - this.x;
+    let y = mouse_y - this.y;
+    let r = Math.sqrt(x * x + y * y);
+    let sinc = 1000 * (Math.sin((r + 8 * render_ticks) / 50) / r);
 
-    this.refresh_interval = 1000 * Math.random() + 500;
+    this.dy -= sinc * Math.sin(render_ticks / 10);
+    this.dx += sinc * Math.cos(render_ticks / 10);
+
+    this.radius = 1;
+    this.radius = clamp(this.radius, 0, 4);
+
+    if (this.row == 20 && this.col == 20) {
+      console.log(this.radius);
+    }
+
+    // this.refresh_interval = 1000 * Math.random() + 500;
     setTimeout(() => {
       this.update();
     }, this.refresh_interval);
@@ -65,7 +93,7 @@ class Cell {
 
   render() {
     if (this.visible) {
-      let c = circle(this.x, this.y, 1);
+      let c = circle(this.x + this.dx, this.y + this.dy, this.radius);
       render_circle(c);
     }
   }
@@ -113,6 +141,8 @@ function render() {
   // ctx.fillRect(0, 0, width, height);
 
   render_grid(grid, width, height);
+
+  render_ticks += 1;
 }
 
 let fps = 60;
