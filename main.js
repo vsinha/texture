@@ -62,7 +62,7 @@ class Cell {
     this.visible = true;
     this.update();
 
-    // this.refresh_interval = 10 * Math.random();
+    this.refresh_interval = 1000 / 60;
   }
 
   update() {
