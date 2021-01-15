@@ -56,22 +56,14 @@ class Cell {
     let x = mouse_x - this.x;
     let y = mouse_y - this.y;
     let r = Math.sqrt(x * x + y * y);
-    let sinc = 1000 * (Math.sin((r + 8 * render_ticks) / 50) / r);
+    let sinc = 1000 * (Math.sin((r + 8 * render_ticks) / 200) / r);
 
-    this.dy -= sinc * Math.sin(render_ticks / 10);
-    this.dx += sinc * Math.cos(render_ticks / 10);
-
-    this.radius = 1;
-    this.radius = clamp(this.radius, 0, 4);
-
-    if (this.row == 20 && this.col == 20) {
-      //console.log(this.radius);
-    }
+    this.dy -= sinc * Math.sin(render_ticks / 40);
+    this.dx += sinc * Math.cos(render_ticks / 40);
   }
 
   render() {
     if (this.visible) {
-      // draw_circle(this.x + this.dx, this.y + this.dy, this.radius);
       draw_rect(this.x + this.dx, this.y + this.dy);
     }
   }
@@ -101,7 +93,7 @@ function init_grid(width, height, cell_width, cell_height) {
 }
 
 function draw_rect(x, y, radius) {
-  ctx.rect(x, y, 1, 1); // fill in the pixel at (10,10)
+  ctx.rect(x, y, 2, 2); // fill in the pixel at (10,10)
 }
 
 function draw_circle(x, y, radius) {
@@ -112,7 +104,7 @@ function draw_circle(x, y, radius) {
 function render_grid(grid, width, height) {
   ctx.beginPath();
   ctx.lineWidth = 1;
-  ctx.strokeStyle = "#fffdda";
+  ctx.fillStyle = "#fffdda";
 
   for (const row of grid) {
     for (const cell of row) {
@@ -120,7 +112,7 @@ function render_grid(grid, width, height) {
     }
   }
 
-  ctx.stroke();
+  ctx.fill();
 }
 
 function update() {
@@ -134,11 +126,7 @@ function update() {
 function render() {
   ctx.globalCompositeOperation = "destination-over";
   ctx.clearRect(0, 0, width, height); // clear canvas
-  // ctx.fillStyle = "black";
-  // ctx.fillRect(0, 0, width, height);
-
   render_grid(grid, width, height);
-
   render_ticks += 1;
 }
 
