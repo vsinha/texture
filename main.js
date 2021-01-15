@@ -25,21 +25,6 @@ function init() {
   grid = init_grid(width, height, 10, 10);
 }
 
-function circle(x, y, radius) {
-  let circle = new Path2D();
-  circle.arc(x, y, radius, 0, 2 * Math.PI, false);
-  return circle;
-}
-
-function render_circle(circle) {
-  ctx.fillStyle = "#fffdda";
-  ctx.fill(circle); //   <<< pass circle to context
-
-  // ctx.lineWidth = 1;
-  // ctx.strokeStyle = '#000066';
-  // ctx.stroke(circle); // <<< pass circle here too
-}
-
 function distance_2d(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
@@ -86,8 +71,8 @@ class Cell {
 
   render() {
     if (this.visible) {
-      let c = circle(this.x + this.dx, this.y + this.dy, this.radius);
-      render_circle(c);
+      // draw_circle(this.x + this.dx, this.y + this.dy, this.radius);
+      draw_rect(this.x + this.dx, this.y + this.dy);
     }
   }
 }
@@ -115,12 +100,30 @@ function init_grid(width, height, cell_width, cell_height) {
   return grid;
 }
 
+function draw_rect(x, y, radius) {
+  ctx.rect(x, y, 1, 1); // fill in the pixel at (10,10)
+}
+
+function draw_circle(x, y, radius) {
+  ctx.moveTo(x, y);
+  ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+}
+
 function render_grid(grid, width, height) {
+  ctx.beginPath();
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#fffdda";
   for (const row of grid) {
     for (const cell of row) {
       cell.render();
     }
   }
+
+  ctx.stroke();
+  // ctx.fillStyle = "#fffdda";
+
+  // ctx.fill();
 }
 
 function update() {
@@ -151,8 +154,8 @@ function update_loop() {}
 function draw_loop() {
   setTimeout(function () {
     update();
-    requestAnimationFrame(draw_loop);
     render();
+    requestAnimationFrame(draw_loop);
   }, 1000 / fps);
 }
 
