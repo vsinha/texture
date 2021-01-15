@@ -20,9 +20,9 @@ function init() {
 
   canvas.style.background = "#011224";
 
-  update_loop();
-  draw_loop();
   grid = init_grid(width, height, 10, 10);
+
+  draw_loop();
 }
 
 function distance_2d(x1, y1, x2, y2) {
@@ -111,9 +111,9 @@ function draw_circle(x, y, radius) {
 
 function render_grid(grid, width, height) {
   ctx.beginPath();
-
   ctx.lineWidth = 1;
   ctx.strokeStyle = "#fffdda";
+
   for (const row of grid) {
     for (const cell of row) {
       cell.render();
@@ -121,14 +121,9 @@ function render_grid(grid, width, height) {
   }
 
   ctx.stroke();
-  // ctx.fillStyle = "#fffdda";
-
-  // ctx.fill();
 }
 
 function update() {
-  now = new Date();
-
   for (const row of grid) {
     for (const cell of row) {
       cell.update();
@@ -149,14 +144,10 @@ function render() {
 
 let fps = 60;
 
-function update_loop() {}
-
 function draw_loop() {
-  setTimeout(function () {
-    update();
-    render();
-    requestAnimationFrame(draw_loop);
-  }, 1000 / fps);
+  update();
+  render();
+  requestAnimationFrame(draw_loop);
 }
 
 onmousemove = function (e) {
