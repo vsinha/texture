@@ -16,7 +16,7 @@ let mouse_y;
 let rows_to_remove = 10;
 
 let carousel_max = 3;
-let carousel_index = 1;
+let carousel_index = 0;
 
 const times = [];
 let fps = 0;
