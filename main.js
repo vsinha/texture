@@ -13,7 +13,7 @@ let render_ticks;
 let mouse_x;
 let mouse_y;
 
-let rows_to_remove = 5;
+let rows_to_remove = 10;
 
 let carousel_max = 3;
 let carousel_index = 1;
@@ -100,18 +100,20 @@ class Cell {
   //  twinkly
   mode_2_update() {
     if (this.i == 0) {
-      let visible_chance = 0.1;
+      let visible_chance = 0.5;
       visible_chance += 20 / distance_2d(this.x, this.y, mouse_x, mouse_y);
-      this.visible = Math.random() < 0.2;
+      this.visible = Math.random() < 0.4;
       this.period = Math.floor(Math.random() * 100);
     }
     this.i += 1;
     this.i = this.i % this.period;
 
-    let x = mouse_x - this.x;
-    let y = mouse_y - this.y;
-    this.dx = Math.pow(x / 10, 2);
-    this.dy = Math.pow(y / 10, 2);
+    let dx = mouse_x - this.x;
+    let dy = mouse_y - this.y;
+    let r = Math.sqrt(dx * dx + dy * dy);
+
+    this.dx = -(40 * dx) / r;
+    this.dy = -(40 * dy) / r;
   }
 
   mode_3_update() {
