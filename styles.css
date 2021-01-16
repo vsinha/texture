@@ -2,3 +2,18 @@ html, body {
     margin: 0 !important;
     padding: 0 !important;
 }
+
+#container {
+    position: relative;
+}
+
+#container #main_canvas, .overlay {
+    position: absolute;
+}
+
+.overlay {
+    margin:3px;
+    color: #fffdda;
+    font-size: 8;
+    font-family: 'Space Mono', monospace;
+}

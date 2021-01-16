@@ -15,8 +15,13 @@ let mouse_y;
 
 let rows_to_remove = 0;
 
+const times = [];
+let fps = 0;
+let fps_div;
+
 function init() {
   canvas = document.getElementById("main_canvas");
+  fps_div = document.getElementById("fps");
   ctx = canvas.getContext("2d");
 
   canvas.style.background = "#011224";
@@ -161,9 +166,20 @@ function render() {
   render_ticks += 1;
 }
 
+function update_fps() {
+  const now = performance.now();
+  while (times.length > 0 && times[0] <= now - 1000) {
+    times.shift();
+  }
+  times.push(now);
+  fps = times.length;
+  fps_div.innerHTML = fps;
+}
+
 function draw_loop() {
   update();
   render();
+  update_fps();
   animation_token = requestAnimationFrame(draw_loop);
 }
 
@@ -179,35 +195,34 @@ window.onload = function () {
   start();
 };
 
-window.addEventListener(
-  "keydown",
-  (e) => {
-    let code = keyboard_map[e.keyCode];
-    switch (code) {
-      case "R":
-        reset();
-        break;
-      case "SPACE":
-        if (animation_token == null) {
-          start();
-        } else {
-          stop();
-        }
-        break;
-      case "MINUS":
-        rows_to_remove += 1;
+window.onkeypress = (e) => {
+  console.log(e.keyCode);
+  let code = keyboard_map[e.keyCode];
+  switch (code) {
+    case "R":
+      reset();
+      break;
+    case "SPACE":
+      if (animation_token == null) {
+        start();
+      } else {
         stop();
-        reset();
-        break;
-      case "EQUALS":
-        rows_to_remove -= 1;
-        stop();
-        reset();
-        break;
-      default:
-        console.log(code);
-        break;
-    }
-  },
-  false
-);
+      }
+      break;
+    case "MINUS":
+      rows_to_remove += 1;
+      stop();
+      reset();
+      break;
+    case "EQUALS":
+      rows_to_remove -= 1;
+      stop();
+      reset();
+      break;
+    case "QUESTION_MARK":
+      break;
+    default:
+      console.log(code);
+      break;
+  }
+};
