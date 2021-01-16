@@ -13,7 +13,10 @@ let render_ticks;
 let mouse_x;
 let mouse_y;
 
-let rows_to_remove = 0;
+let rows_to_remove = 5;
+
+let carousel_max = 3;
+let carousel_index = 1;
 
 const times = [];
 let fps = 0;
@@ -66,7 +69,7 @@ function clamp(num, min, max) {
 }
 
 class Cell {
-  constructor(row, col, x, y, width, height) {
+  constructor(row, col, x, y, width, height, mode) {
     this.row = row;
     this.col = col;
     this.x = x;
@@ -78,20 +81,56 @@ class Cell {
     this.height = height;
     this.visible = true;
     this.update();
+    this.mode = mode;
+    this.i = 0;
   }
 
-  update() {
-    // let visible_chance = 0.1;
-    // visible_chance += 20 / distance_2d(this.x, this.y, mouse_x, mouse_y);
-    // this.visible = Math.random() < 0.9;
-
+  // wormhole
+  mode_1_update() {
     let x = mouse_x - this.x;
     let y = mouse_y - this.y;
     let r = Math.sqrt(x * x + y * y);
-    let sinc = 1000 * (Math.sin((r + 8 * render_ticks) / 200) / r);
 
-    this.dy -= sinc * Math.sin(render_ticks / 40);
-    this.dx += sinc * Math.cos(render_ticks / 40);
+    let sinc = 200 * (Math.sin((r + 8 * render_ticks) / 200) / r);
+
+    this.dy -= sinc * Math.sin(render_ticks / 100);
+    this.dx += sinc * Math.cos(render_ticks / 100);
+  }
+
+  //  twinkly
+  mode_2_update() {
+    if (this.i == 0) {
+      let visible_chance = 0.1;
+      visible_chance += 20 / distance_2d(this.x, this.y, mouse_x, mouse_y);
+      this.visible = Math.random() < 0.2;
+      this.period = Math.floor(Math.random() * 100);
+    }
+    this.i += 1;
+    this.i = this.i % this.period;
+
+    let x = mouse_x - this.x;
+    let y = mouse_y - this.y;
+    this.dx = Math.pow(x / 10, 2);
+    this.dy = Math.pow(y / 10, 2);
+  }
+
+  mode_3_update() {
+    let x = mouse_x - this.x;
+    let y = mouse_y - this.y;
+    let r = Math.sqrt(x * x + y * y);
+    let sinc = -900 * (Math.sin((r + render_ticks / 2) / 10) / r);
+
+    this.dy = sinc;
+  }
+
+  update() {
+    if (this.mode == 0) {
+      this.mode_1_update();
+    } else if (this.mode == 1) {
+      this.mode_2_update();
+    } else if (this.mode == 2) {
+      this.mode_3_update();
+    }
   }
 
   render() {
@@ -119,7 +158,8 @@ function init_grid(width, height, rows_to_remove, cell_width, cell_height) {
           col * (height / cols) +
           cell_height / 2,
         cell_width,
-        cell_height
+        cell_height,
+        carousel_index
       );
       row_elems.push(cell);
     }
@@ -195,34 +235,49 @@ window.onload = function () {
   start();
 };
 
-window.onkeypress = (e) => {
-  console.log(e.keyCode);
-  let code = keyboard_map[e.keyCode];
-  switch (code) {
+function mod(n, m) {
+  return ((n % m) + m) % m;
+}
+
+document.body.onkeydown = (e) => {
+  var keys = event2string(e);
+  console.log(keys); // e.g. "Ctrl + A"
+  switch (keys) {
     case "R":
       reset();
       break;
-    case "SPACE":
+    case "Space":
       if (animation_token == null) {
         start();
       } else {
         stop();
       }
       break;
-    case "MINUS":
+    case "-":
       rows_to_remove += 1;
       stop();
       reset();
       break;
-    case "EQUALS":
+    case "+":
       rows_to_remove -= 1;
       stop();
+      reset();
+      break;
+    case "P":
+      carousel_index -= 1;
+      carousel_index = mod(carousel_index, carousel_max);
+      console.log(carousel_index);
+      reset();
+      break;
+    case "N":
+      carousel_index += 1;
+      carousel_index = mod(carousel_index, carousel_max);
+      console.log(carousel_index);
       reset();
       break;
     case "QUESTION_MARK":
       break;
     default:
-      console.log(code);
       break;
   }
 };
