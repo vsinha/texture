@@ -1,28 +1,55 @@
-let width = window.innerWidth;
-let height = window.innerHeight;
+let width;
+let height;
 
 let canvas;
 let ctx;
+let animation_token;
 
 let grid;
 let now;
 
-let render_ticks = 0;
+let render_ticks;
 
-let mouse_x = width / 2;
-let mouse_y = height / 2;
+let mouse_x;
+let mouse_y;
+
+let rows_to_remove = 0;
 
 function init() {
   canvas = document.getElementById("main_canvas");
   ctx = canvas.getContext("2d");
-  ctx.canvas.width = width;
-  ctx.canvas.height = height;
 
   canvas.style.background = "#011224";
 
-  grid = init_grid(width, height, 10, 10);
+  reset_window_size();
+  reset();
+}
 
+function start() {
   draw_loop();
+}
+
+function stop() {
+  window.cancelAnimationFrame(animation_token);
+  animation_token = null;
+}
+
+function reset_window_size() {
+  ctx.canvas.width = window.innerWidth;
+  ctx.canvas.height = window.innerHeight;
+}
+
+function reset() {
+  let cell_width = 10;
+  render_ticks = 0;
+  width = window.innerWidth - rows_to_remove * cell_width;
+  height = window.innerHeight - rows_to_remove * cell_width;
+
+  mouse_x = width / 2;
+  mouse_y = height / 2;
+
+  grid = init_grid(width, height, rows_to_remove, cell_width, cell_width);
+  render();
 }
 
 function distance_2d(x1, y1, x2, y2) {
@@ -69,7 +96,7 @@ class Cell {
   }
 }
 
-function init_grid(width, height, cell_width, cell_height) {
+function init_grid(width, height, rows_to_remove, cell_width, cell_height) {
   let grid = [];
   let rows = width / cell_width;
   let cols = height / cell_height;
@@ -80,8 +107,12 @@ function init_grid(width, height, cell_width, cell_height) {
       let cell = new Cell(
         row,
         col,
-        row * (width / rows) + cell_width / 2,
-        col * (height / cols) + cell_height / 2,
+        (cell_width * rows_to_remove) / 2 +
+          row * (width / rows) +
+          cell_width / 2,
+        (cell_height * rows_to_remove) / 2 +
+          col * (height / cols) +
+          cell_height / 2,
         cell_width,
         cell_height
       );
@@ -125,24 +156,58 @@ function update() {
 
 function render() {
   ctx.globalCompositeOperation = "destination-over";
-  ctx.clearRect(0, 0, width, height); // clear canvas
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); // clear canvas
   render_grid(grid, width, height);
   render_ticks += 1;
 }
 
-let fps = 60;
-
 function draw_loop() {
   update();
   render();
-  requestAnimationFrame(draw_loop);
+  animation_token = requestAnimationFrame(draw_loop);
 }
 
-onmousemove = function (e) {
+window.onresize = reset_window_size;
+
+window.onmousemove = function (e) {
   mouse_x = e.clientX;
   mouse_y = e.clientY;
 };
 
 window.onload = function () {
   init();
+  start();
 };
+
+window.addEventListener(
+  "keydown",
+  (e) => {
+    let code = keyboard_map[e.keyCode];
+    switch (code) {
+      case "R":
+        reset();
+        break;
+      case "SPACE":
+        if (animation_token == null) {
+          start();
+        } else {
+          stop();
+        }
+        break;
+      case "MINUS":
+        rows_to_remove += 1;
+        stop();
+        reset();
+        break;
+      case "EQUALS":
+        rows_to_remove -= 1;
+        stop();
+        reset();
+        break;
+      default:
+        console.log(code);
+        break;
+    }
+  },
+  false
+);
