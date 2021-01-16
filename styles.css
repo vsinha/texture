@@ -7,7 +7,7 @@ html, body {
     position: relative;
 }
 
-#container #main_canvas, .overlay {
+#container #main_canvas, .overlay_container {
     position: absolute;
 }
 
@@ -17,3 +17,16 @@ html, body {
     font-size: 8;
     font-family: 'Space Mono', monospace;
 }
+
+#help{
+    color:rgba(0,0,0,0);
+}
+#help:hover{
+    color: #fffdda;
+}
+
+.overlay_container {
+    display: flex;
+}
+
+
