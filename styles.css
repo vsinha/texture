@@ -19,10 +19,12 @@ html, body {
 }
 
 #help{
-    color:rgba(0,0,0,0);
-}
-#help:hover{
+    visibility: hidden;
     color: #fffdda;
+}
+
+#help_sign:hover #help {
+    visibility: visible;
 }
 
 .overlay_container {
